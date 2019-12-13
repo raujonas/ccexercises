@@ -1,0 +1,35 @@
+version: "2"
+services:
+  textprocessor:
+    image: ccexercises/text-processor-service:v1
+    networks:
+      - net1
+
+  notebook:
+    image: ccexercises/notebookapp:v1
+    ports:
+      - "8080:80"
+    networks:
+      - net1
+    depends_on:
+      - textprocessor
+      - database
+    environment:
+      - TPMODE=remoteSingle
+      - TPURL=http://textprocessor:80/api
+      - DBMODE=jdbc
+      - DBURL=jdbc:mysql://database:3306/NotesDB
+      - DBUSER=root
+      - DBPASS=secret
+      - DBHOST=database
+
+  database:
+    image: mysql:5.7
+    networks:
+      - net1
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=NotesDB
+
+networks:
+  net1:
